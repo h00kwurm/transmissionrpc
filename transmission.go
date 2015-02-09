@@ -56,6 +56,7 @@ type Request struct {
 type ResponseArguments struct {
 	Torrents []Torrent `json:"torrents,omitempty"`
 	Added    Torrent   `json:"torrent-added,omitempty"`
+	Session
 }
 
 type Response struct {
@@ -63,6 +64,11 @@ type Response struct {
 	Result string            `json:"result"`
 }
 
+// ***TODO*** :: must change to accept an interface
+// so each helper method can do what i explain below.
+// i'm thinking this should accept an interface that would be
+// placed within Response::ResponseArguments so that
+// we aren't creating this really messy ResponseArguments struct
 func (trans *Client) makeRequest(request Request) (Response, error) {
 	jsonified, err := json.Marshal(request)
 	if err != nil {

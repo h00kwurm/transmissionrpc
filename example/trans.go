@@ -63,3 +63,10 @@ func moveTorrent(client *transmissionrpc.Client, ids []int) {
 		return
 	}
 }
+
+func getSessionStats(client *transmissionrpc.Client) {
+	err := client.GetSessionStats()
+	if err != nil {
+		fmt.Println(err)
+	}
+}
