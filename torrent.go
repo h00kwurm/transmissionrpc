@@ -80,6 +80,11 @@ type RemoveTorrentArguments struct {
 	ShouldDelete bool  `json:"delete-local-data,omitempty"`
 }
 
+// this is misleading because while it takes an array it only takes one
+// "should i delete it" boolean. its a vestige of the rpc call. i'd
+// assume that in practice it just distributes the bool over all ids
+// I hate it. i might make it an official single id and wrap this
+// for any multiplicity.
 func (client *Client) RemoveTorrent(ids []int, clean bool) error {
 
 	request := Request{
@@ -87,6 +92,41 @@ func (client *Client) RemoveTorrent(ids []int, clean bool) error {
 		Args: RemoveTorrentArguments{
 			Ids:          ids,
 			ShouldDelete: clean,
+		},
+	}
+
+	resp, err := client.makeRequest(request)
+	if err != nil {
+		dealWithIt(err.Error())
+		return err
+	}
+
+	if resp.Result != "success" {
+		return errors.New("something totally busted because transmission doesnt care about unfound ids")
+	} else {
+		return nil
+	}
+}
+
+type MoveTorrentArguments struct {
+	Ids        []int  `json:"ids,omitempty"`
+	Location   string `json:"location,omitempty"`
+	ShouldMove bool   `json:"move,omitempty"`
+}
+
+// I feel the same way about this as i do the remove function
+// the rpc is irritating. maybe that's the point of writing something like this
+// cleaning up the underlying stuff. i think with that thought expect soon
+// me to make these only take single ids and have helper functions for many
+// with some structure like [{id, location, move}] as args
+func (client *Client) MoveTorrent(ids []int, location string, move bool) error {
+
+	request := Request{
+		Method: "torrent-set-location",
+		Args: MoveTorrentArguments{
+			Ids:        ids,
+			Location:   location,
+			ShouldMove: move,
 		},
 	}
 

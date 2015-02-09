@@ -18,6 +18,10 @@ func main() {
 
 	// this is so you can watch it work from another UI (web ui in my case)
 	time.Sleep(10 * time.Second)
+	moveTorrent(transmission, []int{torrentId})
+
+	// this is so you can watch it work from another UI (web ui in my case)
+	time.Sleep(10 * time.Second)
 	removeTorrent(transmission, []int{torrentId})
 
 }
@@ -46,6 +50,14 @@ func addTorrent(client *transmissionrpc.Client) (int, error) {
 
 func removeTorrent(client *transmissionrpc.Client, ids []int) {
 	err := client.RemoveTorrent(ids, true)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func moveTorrent(client *transmissionrpc.Client, ids []int) {
+	err := client.MoveTorrent(ids, "/home/anatraj/Music", true)
 	if err != nil {
 		fmt.Println(err)
 		return
