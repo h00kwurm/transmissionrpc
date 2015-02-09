@@ -1,8 +1,6 @@
 package transmissionrpc
 
-import (
-	"fmt"
-)
+import ()
 
 type Torrent struct {
 	Id        int    `json:"id,omitempty"`
@@ -34,7 +32,7 @@ func (client *Client) GetTorrentsWithFields(fields []string) ([]Torrent, error) 
 
 	resp, err := client.makeRequest(request)
 	if err != nil {
-		fmt.Println(err)
+		dealWithIt(err.Error())
 		return []Torrent{}, err
 	}
 	return resp.Args.Torrents, nil
