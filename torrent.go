@@ -1,6 +1,8 @@
 package transmissionrpc
 
-import ()
+import (
+	"errors"
+)
 
 type Torrent struct {
 	Id        int    `json:"id,omitempty"`
@@ -71,4 +73,32 @@ func (client *Client) AddTorrent(url, location string) (Torrent, error) {
 	}
 
 	return resp.Args.Added, nil
+}
+
+type RemoveTorrentArguments struct {
+	Ids          []int `json:"ids,omitempty"`
+	ShouldDelete bool  `json:"delete-local-data,omitempty"`
+}
+
+func (client *Client) RemoveTorrent(ids []int, clean bool) error {
+
+	request := Request{
+		Method: "torrent-remove",
+		Args: RemoveTorrentArguments{
+			Ids:          ids,
+			ShouldDelete: clean,
+		},
+	}
+
+	resp, err := client.makeRequest(request)
+	if err != nil {
+		dealWithIt(err.Error())
+		return err
+	}
+
+	if resp.Result != "success" {
+		return errors.New("something totally busted because transmission doesnt care about unfound ids")
+	} else {
+		return nil
+	}
 }
