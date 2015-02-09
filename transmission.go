@@ -48,18 +48,14 @@ func dealWithIt(err string) {
 	}
 }
 
-type RequestArguments struct {
-	Ids    []int    `json:"ids,omitempty"`
-	Fields []string `json:"fields,omitempty"`
-}
-
 type Request struct {
-	Method string           `json:"method"`
-	Args   RequestArguments `json:"arguments"`
+	Method string      `json:"method"`
+	Args   interface{} `json:"arguments"`
 }
 
 type ResponseArguments struct {
 	Torrents []Torrent `json:"torrents,omitempty"`
+	Added    Torrent   `json:"torrent-added,omitempty"`
 }
 
 type Response struct {
