@@ -1,6 +1,7 @@
 package transmissionrpc
 
 import (
+	"encoding/json"
 	"errors"
 )
 
@@ -25,6 +26,10 @@ type GetTorrentArguments struct {
 	Fields []string `json:"fields,omitempty"`
 }
 
+type GetTorrentsResponse struct {
+	Torrents []Torrent `json:"torrents,omitempty"`
+}
+
 func (client *Client) GetTorrents() ([]Torrent, error) {
 	return client.GetTorrentsWithFields([]string{"name", "id", "size", "addedDate", "downloadDir"})
 }
@@ -43,13 +48,23 @@ func (client *Client) GetTorrentsWithFields(fields []string) ([]Torrent, error) 
 		dealWithIt(err.Error())
 		return []Torrent{}, err
 	}
-	return resp.Args.Torrents, nil
 
+	response := GetTorrentsResponse{}
+	err = json.Unmarshal(resp.Args, &response)
+	if err != nil {
+		return []Torrent{}, err
+	}
+
+	return response.Torrents, nil
 }
 
 type AddTorrentArguments struct {
 	URI      string `json:"filename,omitempty"`
 	Location string `json:"download-dir,omitempty"`
+}
+
+type AddTorrentResponse struct {
+	Added Torrent `json:"torrent-added,omitempty"`
 }
 
 //TODO: decide whether we should get the url ourselves
@@ -72,7 +87,13 @@ func (client *Client) AddTorrent(url, location string) (Torrent, error) {
 		return Torrent{}, err
 	}
 
-	return resp.Args.Added, nil
+	response := AddTorrentResponse{}
+	err = json.Unmarshal(resp.Args, &response)
+	if err != nil {
+		return Torrent{}, err
+	}
+
+	return response.Added, nil
 }
 
 type RemoveTorrentArguments struct {

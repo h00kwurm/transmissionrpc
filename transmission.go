@@ -53,22 +53,11 @@ type Request struct {
 	Args   interface{} `json:"arguments"`
 }
 
-type ResponseArguments struct {
-	Torrents []Torrent `json:"torrents,omitempty"`
-	Added    Torrent   `json:"torrent-added,omitempty"`
-	Session
-}
-
 type Response struct {
-	Args   ResponseArguments `json:"arguments,omitempty"`
-	Result string            `json:"result"`
+	Args   json.RawMessage `json:"arguments,omitempty"`
+	Result string          `json:"result"`
 }
 
-// ***TODO*** :: must change to accept an interface
-// so each helper method can do what i explain below.
-// i'm thinking this should accept an interface that would be
-// placed within Response::ResponseArguments so that
-// we aren't creating this really messy ResponseArguments struct
 func (trans *Client) makeRequest(request Request) (Response, error) {
 	jsonified, err := json.Marshal(request)
 	if err != nil {
@@ -94,18 +83,18 @@ func (trans *Client) makeRequest(request Request) (Response, error) {
 		return trans.makeRequest(request)
 	}
 
-	var output Response
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		dealWithIt("error read all" + string(body))
 		return Response{}, err
 	}
 
-	err = json.Unmarshal(body, &output)
+	var response Response
+	err = json.Unmarshal(body, &response)
 	if err != nil {
 		dealWithIt("bad unmarshal")
 		return Response{}, err
 	}
 
-	return output, nil
+	return response, nil
 }

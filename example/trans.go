@@ -3,26 +3,29 @@ package main
 import (
 	"fmt"
 	"github.com/h00kwurm/transmissionrpc"
-	"time"
+	// "time"
 )
 
 func main() {
 	transmission := transmissionrpc.New("http://192.168.0.106", "9091")
-	getTorrents(transmission)
 
-	torrentId, err := addTorrent(transmission)
-	if err != nil {
-		fmt.Println("failed adding torrent")
-		return
-	}
+	getSessionStats(transmission)
 
-	// this is so you can watch it work from another UI (web ui in my case)
-	time.Sleep(10 * time.Second)
-	moveTorrent(transmission, []int{torrentId})
+	// getTorrents(transmission)
 
-	// this is so you can watch it work from another UI (web ui in my case)
-	time.Sleep(10 * time.Second)
-	removeTorrent(transmission, []int{torrentId})
+	// torrentId, err := addTorrent(transmission)
+	// if err != nil {
+	// 	fmt.Println("failed adding torrent")
+	// 	return
+	// }
+
+	// // this is so you can watch it work from another UI (web ui in my case)
+	// time.Sleep(10 * time.Second)
+	// moveTorrent(transmission, []int{torrentId})
+
+	// // this is so you can watch it work from another UI (web ui in my case)
+	// time.Sleep(10 * time.Second)
+	// removeTorrent(transmission, []int{torrentId})
 
 }
 
@@ -65,8 +68,10 @@ func moveTorrent(client *transmissionrpc.Client, ids []int) {
 }
 
 func getSessionStats(client *transmissionrpc.Client) {
-	err := client.GetSessionStats()
+	stats, err := client.GetSessionStats()
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	fmt.Println(stats)
 }

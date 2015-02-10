@@ -1,8 +1,7 @@
 package transmissionrpc
 
 import (
-	"errors"
-	"fmt"
+	"encoding/json"
 )
 
 type Session struct {
@@ -14,7 +13,7 @@ type SessionStats struct {
 	UpSpeed     float64 `json:"uploadSpeed,omitempty"`
 }
 
-func (client *Client) GetSessionStats() error {
+func (client *Client) GetSessionStats() (SessionStats, error) {
 	request := Request{
 		Method: "session-stats",
 	}
@@ -22,13 +21,14 @@ func (client *Client) GetSessionStats() error {
 	resp, err := client.makeRequest(request)
 	if err != nil {
 		dealWithIt(err.Error())
-		return err
+		return SessionStats{}, err
 	}
-	fmt.Println(resp)
 
-	if resp.Result != "success" {
-		return errors.New("something totally busted because transmission doesnt care about unfound ids")
-	} else {
-		return nil
+	var response SessionStats
+	err = json.Unmarshal(resp.Args, &response)
+	if err != nil {
+		return SessionStats{}, err
 	}
+
+	return response, nil
 }
