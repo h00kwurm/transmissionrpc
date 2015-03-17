@@ -1,32 +1,37 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/h00kwurm/transmissionrpc"
+	"os"
 	// "time"
 )
 
 func main() {
-	transmission := transmissionrpc.New("http://192.168.0.106", "9091")
+	transmission := transmissionrpc.New("http://192.168.0.105", "9091")
 
-	getSessionStats(transmission)
+	reader := bufio.NewScanner(os.Stdin)
 
-	// getTorrents(transmission)
+	for {
+		fmt.Print("trans$ ")
+		reader.Scan()
+		text := reader.Text()
+		if text == "list" {
+			getTorrents(transmission)
+		} else if text == "stats" {
+			getSessionStats(transmission)
+		} else if text == "help" {
+			printHelp()
+		} else if text == "q" || text == "quit" {
+			break
+		}
+	}
 
-	// torrentId, err := addTorrent(transmission)
-	// if err != nil {
-	// 	fmt.Println("failed adding torrent")
-	// 	return
-	// }
+}
 
-	// // this is so you can watch it work from another UI (web ui in my case)
-	// time.Sleep(10 * time.Second)
-	// moveTorrent(transmission, []int{torrentId})
-
-	// // this is so you can watch it work from another UI (web ui in my case)
-	// time.Sleep(10 * time.Second)
-	// removeTorrent(transmission, []int{torrentId})
-
+func printHelp() {
+	fmt.Println("Usage: super-basic example of a client\nCommands\n\tlist\n\tstats\n\thelp\n\tquit")
 }
 
 func getTorrents(client *transmissionrpc.Client) {
@@ -68,6 +73,7 @@ func moveTorrent(client *transmissionrpc.Client, ids []int) {
 }
 
 func getSessionStats(client *transmissionrpc.Client) {
+	fmt.Println("getting session stats")
 	stats, err := client.GetSessionStats()
 	if err != nil {
 		fmt.Println(err)

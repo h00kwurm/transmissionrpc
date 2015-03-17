@@ -2,6 +2,7 @@ package transmissionrpc
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type Session struct {
@@ -31,4 +32,8 @@ func (client *Client) GetSessionStats() (SessionStats, error) {
 	}
 
 	return response, nil
+}
+
+func (stats SessionStats) String() string {
+	return fmt.Sprintf("total: %v | download: %v | upload: %v\n", stats.NumTorrents, stats.DownSpeed, stats.UpSpeed)
 }
